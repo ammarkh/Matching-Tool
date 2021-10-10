@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>This Demo for view Simialrity Alg</h1>
+    <label for="">Text For Compare</label>
+    <textarea name="tFC" id="tFC" cols="30" rows="10"></textarea>
+    <br><br>
+
+    <label>Text For Compare With </label>
+    <textarea name="tFCW" id="tFCW" cols="30" rows="10"></textarea>
+
+    <br>
+
+    <div id="res">
+
+    </div>
+    <br><br>
+    <button onclick="singlWordMatching()"> Single Word Matching</button>
+    <button onclick="multiWordMatching()"> Multi Word Matching </button>
+
+</body>
+
+<script type="text/javascript">
+    const stopWords = ['those', 'on', 'own', '’ve', 'yourselves', 'around', 'between', 'four',
+        'been', 'alone', 'off', 'am', 'then', 'other', 'can', 'regarding', 'hereafter', 'front',
+        'too', 'used', 'wherein', '‘ll', 'doing', 'everything', 'up', 'onto', 'never', 'either',
+        'how', 'before', 'anyway', 'since', 'through', 'amount', 'now', 'he', 'was', 'have', 'into',
+        'because', 'not', 'therefore', 'they', 'n’t', 'even', 'whom', 'it', 'see', 'somewhere', 'thereupon',
+        'nothing', 'whereas', 'much', 'whenever', 'seem', 'until', 'whereby', 'at', 'also', 'some', 'last', 'than',
+        'get', 'already', 'our', 'once', 'will', 'noone', "'m", 'that', 'what', 'thus', 'no', 'myself', 'out', 'next',
+        'whatever', 'although', 'though', 'which', 'would', 'therein', 'nor', 'somehow', 'whereupon', 'besides', 'whoever',
+        'ourselves', 'few', 'did', 'without', 'third', 'anything', 'twelve', 'against', 'while', 'twenty', 'if', 'however',
+        'herself', 'when', 'may', 'ours', 'six', 'done', 'seems', 'else', 'call', 'perhaps', 'had', 'nevertheless', 'where',
+        'otherwise', 'still', 'within', 'its', 'for', 'together', 'elsewhere', 'throughout', 'of', 'others', 'show', '’s', 'anywhere',
+        'anyhow', 'as', 'are', 'the', 'hence', 'something', 'hereby', 'nowhere', 'latterly', 'say', 'does', 'neither', 'his', 'go',
+        'forty', 'put', 'their', 'by', 'namely', 'could', 'five', 'unless', 'itself', 'is', 'nine', 'whereafter', 'down', 'bottom',
+        'thereby', 'such', 'both', 'she', 'become', 'whole', 'who', 'yourself', 'every', 'thru', 'except', 'very', 'several', 'among',
+        'being', 'be', 'mine', 'further', 'n‘t', 'here', 'during', 'why', 'with', 'just', "'s", 'becomes', '’ll', 'about', 'a', 'using',
+        'seeming', "'d", "'ll", "'re", 'due', 'wherever', 'beforehand', 'fifty', 'becoming', 'might', 'amongst', 'my', 'empty', 'thence',
+        'thereafter', 'almost', 'least', 'someone', 'often', 'from', 'keep', 'him', 'or', '‘m', 'top', 'her', 'nobody', 'sometime', 'across',
+        '‘s', '’re', 'hundred', 'only', 'via', 'name', 'eight', 'three', 'back', 'to', 'all', 'became', 'move', 'me', 'we', 'formerly', 'so',
+        'i', 'whence', 'under', 'always', 'himself', 'in', 'herein', 'more', 'after', 'themselves', 'you', 'above', 'sixty', 'them', 'your',
+        'made', 'indeed', 'most', 'everywhere', 'fifteen', 'but', 'must', 'along', 'beside', 'hers', 'side', 'former', 'anyone', 'full', 'has',
+        'yours', 'whose', 'behind', 'please', 'ten', 'seemed', 'sometimes', 'should', 'over', 'take', 'each', 'same', 'rather', 'really', 'latter',
+        'and', 'ca', 'hereupon', 'part', 'per', 'eleven', 'ever', '‘re', 'enough', "n't", 'again', '‘d', 'us', 'yet', 'moreover', 'mostly', 'one',
+        'meanwhile', 'whither', 'there', 'toward', '’m', "'ve", '’d', 'give', 'do', 'an', 'quite', 'these', 'everyone', 'towards', 'this', 'cannot',
+        'afterwards', 'beyond', 'make', 'were', 'whether', 'well', 'another', 'below', 'first', 'upon', 'any', 'none', 'many', 'serious', 'various',
+        're', 'two', 'less', '‘ve'];
+
+
+    var exp = "inorganic".toLowerCase(); // that mean the expression of text that we want matching
+    var source = "Measurement of Phosphorus inorganicet TheurineehT".toLowerCase(); // that mean the source of data that matching with it 
+    var result = [];
+
+    function oldMatching() {
+        if (exp.length == 0) return; // if there is no text for matching out of mathing
+        let strArray1 = exp.split(' ');
+        let matchWithArray = source.split(' ');
+
+
+        for (var i = 0; i < matchWithArray.length; i++) {
+            let isMatch = false;
+            for (var k = 0; k < strArray1.length; k++) {
+                if (equalOrContains(strArray1[k], matchWithArray[i])) {
+                    result.push({ 'description': source, 'matchWord': strArray1[k], 'equalWord': matchWithArray[i], 'similarityWord': compareTwoStrings(strArray1[k], matchWithArray[i]), 'similarity': compareTwoStrings(exp, source) });
+                    isMatch = true;
+                }
+            }
+            if (isMatch) break;
+        }
+
+        console.log(result);
+
+    }
+
+    function matchingMultiWords() {
+        if (exp.length == 0) return; // if there is no text for matching out of mathing
+        let strArray1 = exp.split(' ');
+        let matchWithArray = source.split(' ');
+        let similarityPercent = 0; // avrage of similarity for all matching words 
+        let countOfSimilarity = 0; // number of simakarity words.
+
+        console.log(strArray1 + "||" + matchWithArray);
+        let equalWords = [];
+        let matchingWords = [];
+        for (var i = 0; i < matchWithArray.length; i++) {
+
+            for (var k = 0; k < strArray1.length; k++) {
+                if (equalOrContains(strArray1[k], matchWithArray[i])) {
+                    // result.push({ 'description': source, 'matchWord': strArray1[k], 'equalWord': matchWithArray[i], 'similarityWord': compareTwoStrings(strArray1[k], matchWithArray[i]), 'similarity': compareTwoStrings(exp, source) });
+                    similarityPercent += compareTwoStrings(strArray1[k], matchWithArray[i]);
+                    countOfSimilarity++;
+                    equalWords.push(strArray1[k]);
+                    matchingWords.push(matchWithArray[i]);
+                    console.log(strArray1[k] + "**" + matchWithArray[i])
+                }
+            }
+
+        }
+        if (countOfSimilarity > 0) {
+            result.push({ 'description': source, 'similarityWords': (similarityPercent / countOfSimilarity), 'words': equalWords, 'matchingWords': matchingWords, 'NumberOfWords': countOfSimilarity, 'similarity': compareTwoStrings(exp, source) });
+            console.log(countOfSimilarity / strArray1.length);
+        }
+
+        console.log(result);
+
+    }
+
+    function equalOrContains(str1 /* expression test */ = '', str2 /*source text*/ = '') {
+        if (!checkTextAsExpression(str1)) {
+            return false;
+        }
+
+        str1 = str1.toLowerCase();
+        str2 = str2.toLowerCase();
+        // check if text equal 100% or  text start with , end with , contains & similarty > 0.5
+        if ((str2 === str1 || str2.includes(str1) || str1.includes(str2)) && (compareTwoStrings(str1, str2) > 0.7))
+            return true;
+
+
+        return false;
+    }
+
+    function removeAllStopWords(str = '') {
+        return str.replace(new RegExp('\\b(' + stopWords.join('|') + ')\\b', 'g'), '');
+    }
+
+    /**
+     * @function setTextAsExpression: this function used for clear text from apostroph and preposition 
+     * [, _ : -] , in , if , of , at , is, are 
+     */
+    function checkTextAsExpression(expression = '') {
+
+        if (expression.length <= 2) // if the text less than three character then will not apply matching on it.
+            return false;
+
+        const keyWord = [
+            'did', 'you',
+            'has', 'are',
+            'key',
+            'say', 'for',
+            'she', 'this',
+            'had',
+            'the',
+            'have',
+            'they',
+            'them',
+            'that',
+            'else',
+            'more',
+            'hey',
+            'bye',
+        ]; // we will not need three char now .
+
+        if (expression.length <= 4)
+            for (var i = 0; i < keyWord.length; i++)
+                if (keyWord[i] == expression.toLowerCase())
+                    return false;
+
+        return true;
+    }
+
+    /**
+    *similarity
+    */
+
+    function compareTwoStrings(first, second) {
+        first = first.replace(/\s+/g, '')
+        second = second.replace(/\s+/g, '')
+
+        if (first === second) return 1; // identical or empty
+        if (first.length < 2 || second.length < 2) return 0; // if either is a 0-letter or 1-letter string
+
+        let firstBigrams = new Map();
+        for (let i = 0; i < first.length - 1; i++) {
+            const bigram = first.substring(i, i + 2);
+            const count = firstBigrams.has(bigram)
+                ? firstBigrams.get(bigram) + 1
+                : 1;
+
+            firstBigrams.set(bigram, count);
+        };
+
+        let intersectionSize = 0;
+        for (let i = 0; i < second.length - 1; i++) {
+            const bigram = second.substring(i, i + 2);
+            const count = firstBigrams.has(bigram)
+                ? firstBigrams.get(bigram)
+                : 0;
+
+            if (count > 0) {
+                firstBigrams.set(bigram, count - 1);
+                intersectionSize++;
+            }
+        }
+
+        return (2.0 * intersectionSize) / (first.length + second.length - 2);
+    }
+
+    function findBestMatch(mainString, targetStrings) {
+        if (!areArgsValid(mainString, targetStrings)) throw new Error('Bad arguments: First argument should be a string, second should be an array of strings');
+
+        const ratings = [];
+        let bestMatchIndex = 0;
+
+        for (let i = 0; i < targetStrings.length; i++) {
+            const currentTargetString = targetStrings[i];
+            const currentRating = compareTwoStrings(mainString, currentTargetString)
+            ratings.push({ target: currentTargetString, rating: currentRating })
+            if (currentRating > ratings[bestMatchIndex].rating) {
+                bestMatchIndex = i
+            }
+        }
+
+
+        const bestMatch = ratings[bestMatchIndex]
+
+        return { ratings: ratings, bestMatch: bestMatch, bestMatchIndex: bestMatchIndex };
+    }
+
+    function areArgsValid(mainString, targetStrings) {
+        if (typeof mainString !== 'string') return false;
+        if (!Array.isArray(targetStrings)) return false;
+        if (!targetStrings.length) return false;
+        if (targetStrings.find(function (s) { return typeof s !== 'string' })) return false;
+        return true;
+    }
+    /*new matching
+    */
+
+    function newMatching(expression = '', source = '') {
+        if (expression.length == 0) return;
+        let newExpression = removeAllStopWords(expression.toLowerCase());
+        let newSource = removeAllStopWords(source.toLowerCase());
+        let matchingResult = [];
+
+        console.log(newExpression + "//" + newSource);
+    }
+    /**
+    *end similarity here.
+    */
+
+    /***
+    * code keyWord matching 
+    */
+    var codeKeyWords = [
+        '', '', ''
+    ];
+
+    function keyWordMatching() {
+
+    }
+
+
+    function singlWordMatching() {
+        result = [];
+        exp = document.querySelector('#tFC').value;
+        source = document.querySelector('#tFCW').value;
+        newMatching(exp, source);
+        matching();
+        document.querySelector('#res').innerHTML = JSON.stringify(result);
+    }
+
+    function multiWordMatching() {
+        result = [];
+        exp = document.querySelector('#tFC').value.toLowerCase();
+        source = document.querySelector('#tFCW').value.toLowerCase();
+        matchingMultiWords();
+        document.querySelector('#res').innerHTML = JSON.stringify(result);
+    }
+</script>
+
+</html>
