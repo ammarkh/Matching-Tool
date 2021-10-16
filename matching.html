@@ -55,9 +55,14 @@
         'afterwards', 'beyond', 'make', 'were', 'whether', 'well', 'another', 'below', 'first', 'upon', 'any', 'none', 'many', 'serious', 'various',
         're', 'two', 'less', '‘ve'];
 
+    /*****
+     * this code key words source
+     * */
+    const keyWords = [];
+
 
     var exp = "inorganic".toLowerCase(); // that mean the expression of text that we want matching
-    var source = "Measurement of Phosphorus inorganicet TheurineehT".toLowerCase(); // that mean the source of data that matching with it 
+    var source = "Measurement of Phosphorus inorganicet TheurineehT".toLowerCase(); // that mean the source of data that matching with it
     var result = [];
 
     function oldMatching() {
@@ -70,6 +75,7 @@
             let isMatch = false;
             for (var k = 0; k < strArray1.length; k++) {
                 if (equalOrContains(strArray1[k], matchWithArray[i])) {
+                    console.log(strArray1[k] + "//" + matchWithArray[i]);
                     result.push({ 'description': source, 'matchWord': strArray1[k], 'equalWord': matchWithArray[i], 'similarityWord': compareTwoStrings(strArray1[k], matchWithArray[i]), 'similarity': compareTwoStrings(exp, source) });
                     isMatch = true;
                 }
@@ -85,10 +91,9 @@
         if (exp.length == 0) return; // if there is no text for matching out of mathing
         let strArray1 = exp.split(' ');
         let matchWithArray = source.split(' ');
-        let similarityPercent = 0; // avrage of similarity for all matching words 
+        let similarityPercent = 0; // avrage of similarity for all matching words
         let countOfSimilarity = 0; // number of simakarity words.
 
-        console.log(strArray1 + "||" + matchWithArray);
         let equalWords = [];
         let matchingWords = [];
         for (var i = 0; i < matchWithArray.length; i++) {
@@ -100,14 +105,13 @@
                     countOfSimilarity++;
                     equalWords.push(strArray1[k]);
                     matchingWords.push(matchWithArray[i]);
-                    console.log(strArray1[k] + "**" + matchWithArray[i])
                 }
             }
 
         }
         if (countOfSimilarity > 0) {
             result.push({ 'description': source, 'similarityWords': (similarityPercent / countOfSimilarity), 'words': equalWords, 'matchingWords': matchingWords, 'NumberOfWords': countOfSimilarity, 'similarity': compareTwoStrings(exp, source) });
-            console.log(countOfSimilarity / strArray1.length);
+            //console.log(countOfSimilarity / strArray1.length);
         }
 
         console.log(result);
@@ -115,14 +119,15 @@
     }
 
     function equalOrContains(str1 /* expression test */ = '', str2 /*source text*/ = '') {
-        if (!checkTextAsExpression(str1)) {
+        if (!checkTextAsExpression(str1) || !checkTextAsExpression(str2)) {
             return false;
         }
 
         str1 = str1.toLowerCase();
         str2 = str2.toLowerCase();
         // check if text equal 100% or  text start with , end with , contains & similarty > 0.5
-        if ((str2 === str1 || str2.includes(str1) || str1.includes(str2)) && (compareTwoStrings(str1, str2) > 0.7))
+        //  if ((str2 === str1 || str2.includes(str1) || str1.includes(str2)) || (compareTwoStrings(str1, str2) > 0.7))
+        if (compareTwoStrings(str1, str2) > 0.7)
             return true;
 
 
@@ -134,43 +139,49 @@
     }
 
     /**
-     * @function setTextAsExpression: this function used for clear text from apostroph and preposition 
-     * [, _ : -] , in , if , of , at , is, are 
+     * @function setTextAsExpression: this function used for clear text from apostroph and preposition
+     * [, _ : -] , in , if , of , at , is, are
      */
     function checkTextAsExpression(expression = '') {
 
-        if (expression.length <= 2) // if the text less than three character then will not apply matching on it.
-            return false;
+        return ((expression.length) > 1) // if the text less than three character then will not apply matching on it.
 
-        const keyWord = [
-            'did', 'you',
-            'has', 'are',
-            'key',
-            'say', 'for',
-            'she', 'this',
-            'had',
-            'the',
-            'have',
-            'they',
-            'them',
-            'that',
-            'else',
-            'more',
-            'hey',
-            'bye',
-        ]; // we will not need three char now .
 
-        if (expression.length <= 4)
-            for (var i = 0; i < keyWord.length; i++)
-                if (keyWord[i] == expression.toLowerCase())
-                    return false;
+        // const keyWord = [
+        //     'did', 'you',
+        //     'has', 'are',
+        //     'key',
+        //     'say', 'for',
+        //     'she', 'this',
+        //     'had',
+        //     'the',
+        //     'have',
+        //     'they',
+        //     'them',
+        //     'that',
+        //     'else',
+        //     'more',
+        //     'hey',
+        //     'bye',
+        // ]; // we will not need three char now .
 
-        return true;
+        // if (expression.length <= 4)
+        //     for (var i = 0; i < keyWord.length; i++)
+        //         if (keyWord[i] == expression.toLowerCase())
+        //             return false;
+
+        // return true;
     }
 
-    /**
-    *similarity
-    */
+    /*********
+      *  START SIMIALIRTY FUNCTION
+      * *************************************** //// ********************************
+      * *************************************** //// ********************************
+      * *************************************** //// ********************************
+      * *************************************** //// ********************************
+      * ***************************************
+      * *****************************************************************************
+     */
 
     function compareTwoStrings(first, second) {
         first = first.replace(/\s+/g, '')
@@ -233,49 +244,208 @@
         if (targetStrings.find(function (s) { return typeof s !== 'string' })) return false;
         return true;
     }
-    /*new matching
+
+    /*********
+     *  END SIMILARITY FUNCTION
+     * *************************************** //// ********************************
+     * *************************************** //// ********************************
+     * *************************************** //// ********************************
+     * *************************************** //// ********************************
+     * ***************************************
+     * *****************************************************************************
     */
 
-    function newMatching(expression = '', source = '') {
-        if (expression.length == 0) return;
-        let newExpression = removeAllStopWords(expression.toLowerCase());
-        let newSource = removeAllStopWords(source.toLowerCase());
-        let matchingResult = [];
+    /******
+     *
+     * Matching Function
+     * Basic Level( if  found equal words it will be return result without depending on similarity).
+     * *****/
 
-        console.log(newExpression + "//" + newSource);
+    function almostMatching(expression = '', source = '') {
+        if (typeof expression !== 'string')
+            throw 'not supported text for matching ';
+        if (expression.length === 0) return;
+
+        let newSource = removeAllStopWords(source).split(' ').filter(function (el) { return el != '' });
+        let newExpression = removeAllStopWords(expression).split(' ').filter(function (el) { return el != '' });
+        let matchingResult = {};
+        let countOfKeyWords = 0;
+        let countOfMatchWords = 0;
+        let percentOfMatchWords = 0;
+        let matchWord = [];
+        let equalWord = [];
+        console.log(newSource + "''" + newExpression);
+        for (var i = 0; i < newSource.length; i++) {
+            for (var j = 0; j < newExpression.length; j++) {
+
+                if (equalOrContains(newExpression[j], newSource[i])) {
+                    console.log(newExpression[j] + "*//" + newSource[i]);
+                    countOfMatchWords++;
+                    percentOfMatchWords += compareTwoStrings(newSource[i].toLowerCase(), newExpression[j].toLowerCase());
+
+                    if (isAlmostKeyWords(newExpression[j]))
+                        countOfKeyWords++;
+
+                    matchWord.push(newExpression[j]);
+                    equalWord.push(newSource[i]);
+                }
+            }
+        }
+        console.log(percentOfMatchWords);
+        console.log(countOfMatchWords);
+
+        if (countOfKeyWords === 0 && countOfMatchWords === 0)
+            return matchingResult = { 'isMatch': false };
+
+        if (countOfKeyWords > 0)
+            matchingResult = { 'isMatch': true, 'type': ['keyword matching', 'express matching'], 'similarityOfMatchWords': (percentOfMatchWords / countOfMatchWords), 'overAllSimilarity': compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2) };
+        else if (countOfMatchWords > 0)
+            matchingResult = { 'isMatch': true, 'type': ['express matching'], 'similarityOfMatchWords': (percentOfMatchWords / countOfMatchWords), 'overAllSimilarity': compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2) };
+
+        matchWord.forEach(word => {
+            expression.replace(word, '<b style="background-color:yellow">' + word + '</b>');
+        });
+
+        equalWord.forEach(word => {
+            source.replace(word, '<b style="background-color:yellow">' + word + '</b>');
+        });
+
+        matchingResult['source'] = source;
+        matchingResult['expression'] = expression;
+
+        return matchingResult;
     }
+
     /**
-    *end similarity here.
+     * hard level
     */
+    function matching(expression = '', source = '') {
+        if (typeof expression !== 'string')
+            throw 'not supported text for matching ';
+        if (expression.length === 0) return;
+
+        let newSource = removeAllStopWords(source).split(' ').filter(function (el) { return el != '' });
+        let newExpression = removeAllStopWords(expression).split(' ').filter(function (el) { return el != '' });
+
+        let matchingResult = {};
+        let countOfKeyWords = 0;
+        let countOfMatchWords = 0;
+        let percentOfMatchWords = 0;
+        let matchWord = [];
+        let equalWord = [];
+        //  console.log(newSource + "''" + newExpression);
+        for (var i = 0; i < newSource.length; i++) {
+            for (var j = 0; j < newExpression.length; j++) {
+
+                if (equalOrContains(newExpression[j], newSource[i])) {
+                    console.log(newExpression[j] + "//" + newSource[i]);
+                    countOfMatchWords++;
+                    percentOfMatchWords += compareTwoStrings(newSource[i].toLowerCase(), newExpression[j].toLowerCase());
+
+                    if (isAlmostKeyWords(newExpression[j]))
+                        countOfKeyWords++;
+
+                    matchWord.push(newExpression[j]);
+                    equalWord.push(newSource[i]);
+                }
+            }
+        }
+
+
+        if (countOfKeyWords === 0 && countOfMatchWords === 0)
+            return matchingResult = { 'isMatch': false };
+
+        let match = false;
+
+        if (countOfKeyWords > 0) {
+            match = true;
+            matchingResult = { 'isMatch': true, 'type': ['keyword matching', 'express matching'], 'similarityOfMatchWords': (percentOfMatchWords / countOfMatchWords), 'overAllSimilarity': compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2) };
+        } else if (countOfMatchWords > 0) {
+            // let matchingSim = ((percentOfMatchWords / countOfMatchWords) + (compareTwoStrings(expression.toLowerCase(), source.toLowerCase()))) / 2;
+            // matchingSim = (((countOfMatchWords * 100) / newExpression.length) + (matchingSim * 100)) / 2;
+
+            let matchingSim = (((countOfMatchWords * 100) / newSource.length) > 40);
+            console.log('num = ' + ((countOfMatchWords * 100) + "/" + newSource.length));
+            console.log('precent = ' + ((countOfMatchWords * 100) / newSource.length));
+            console.log('similarity = ' + compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2));
+            // 3 similarity overall , matchword , precent of match word to overall comarable word
+            //  console.log(( percentOfMatchWords / countOfMatchWords)  + "//"+ ((countOfMatchWords*100)/newExpression.length) +"//" + matchingSim);
+            let x = (percentOfMatchWords / countOfMatchWords); // avrage for all matching words in description
+
+            x += ((countOfMatchWords * 100) / newSource.length) / 100; // the prcent of equal words of all description
+
+            x += parseInt(compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2));
+            console.log(x / 3);
+            if (matchingSim) {
+                match = true;
+                matchingResult = { 'isMatch': true, 'type': ['express matching'], 'similarityOfMatchWords': (percentOfMatchWords / countOfMatchWords), 'overAllSimilarity': compareTwoStrings(removeAllStopWords(expression).toLowerCase(), removeAllStopWords(source).toLowerCase()).toFixed(2) };
+            }
+        }
+
+        if (match == false) return matchingResult = { 'isMatch': false };
+
+        matchWord.forEach(word => {
+
+            expression = expression.replace(word, `<b style='background-color:yellow'>${word}</b>`);
+        });
+
+
+
+
+        console.log('expression = ' + expression);
+        equalWord.forEach(word => {
+            source = source.replace(word, `<b style='background-color:yellow'>${word}</b>`);
+        });
+
+        matchingResult['source'] = source;
+        matchingResult['expression'] = expression;
+
+        return matchingResult;
+    }
 
     /***
-    * code keyWord matching 
-    */
-    var codeKeyWords = [
-        '', '', ''
-    ];
-
-    function keyWordMatching() {
+     * Start Check keyWords Function
+     * This Function Using For Check if  the str [string] paramter is equal the one of key word source
+     * Basic Level if similarity > 0.7
+     * */
+    function isAlmostKeyWords(str) {
+        for (let i = 0; i < keyWords.length; i++)
+            return (compareTwoStrings(keyWords[i].toLowerCase(), str) >= 0.7);
 
     }
+
+    function isEqualOrContainsKeyWord() {
+        for (let i = 0; i < keyWords.length; i++) {
+            let key = keyWords[i].toLowerCase();
+            if (key === str || key.includes(str) || str.includes(key))
+                return true;
+        }
+        return false;
+    }
+    /**
+    *End Check KeyWords
+    */
+
 
 
     function singlWordMatching() {
         result = [];
         exp = document.querySelector('#tFC').value;
         source = document.querySelector('#tFCW').value;
-        newMatching(exp, source);
-        matching();
-        document.querySelector('#res').innerHTML = JSON.stringify(result);
+        matching(exp, source);
+        //matching();
+        document.querySelector('#res').innerHTML = JSON.stringify(almostMatching(exp, source));
     }
 
     function multiWordMatching() {
         result = [];
-        exp = document.querySelector('#tFC').value.toLowerCase();
-        source = document.querySelector('#tFCW').value.toLowerCase();
-        matchingMultiWords();
-        document.querySelector('#res').innerHTML = JSON.stringify(result);
+        exp = document.querySelector('#tFC').value;
+        source = document.querySelector('#tFCW').value;
+
+        document.querySelector('#res').innerHTML = JSON.stringify(matching(exp, source));
     }
+
+   
 </script>
 
 </html>
